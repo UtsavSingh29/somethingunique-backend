@@ -46,6 +46,8 @@ Create a .env file in the root directory and add the necessary environment varia
 ```
 DATABASE_URL=your_database_url
 JWT_SECRET=your_jwt_secret
+EMAIL_USER=your_nodemailer_mail
+EMAIL_PASS=your_nodemailer_pass
 ```
 
 #### Database Setup: 
