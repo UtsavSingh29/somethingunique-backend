@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const roles = ['super_admin', 'college_admin', 'club_admin', 'student'];
 const UserSchema = new Schema(
     {
         username: {
@@ -29,12 +28,6 @@ const UserSchema = new Schema(
             type: String,
             default: '',
         },
-        role: {
-            type: [String],
-            enum: roles,
-            required: true,
-            default: ['student'], // Default to student role if none provided
-          },
     },
     {
         timestamps: true,
