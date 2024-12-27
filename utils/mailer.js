@@ -49,11 +49,9 @@ const sendOtp = async (email, otp) => {
         return null;
     }
 };
-
-// HTTP server to test the email-sending functionality
 const server = http.createServer(async (request, response) => {
-    const email = 'receiveremail@gmail.com'; // Replace with receiver's email
-    const otp = Math.floor(100000 + Math.random() * 900000); // Generate a random 6-digit OTP
+    const email = 'receiveremail@gmail.com'; 
+    const otp = Math.floor(100000 + Math.random() * 900000); 
     console.log('Generated OTP:', otp);
 
     const result = await sendOtp(email, otp);
@@ -65,7 +63,6 @@ const server = http.createServer(async (request, response) => {
         response.end('Failed to send OTP.');
     }
 });
-
 server.listen(8080, () => {
     console.log('Server running on http://localhost:8080');
 });
