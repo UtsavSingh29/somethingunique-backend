@@ -3,17 +3,15 @@ const http = require('http');
 require('dotenv').config();
 const sendOtp = async (email, otp) => {
     try {
-        console.log('Connecting to Gmail SMTP server...');
         const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        port: 465,
-        secure: true,
-        auth: {
-            user: process.env.EMAIL_USER, // Gmail address
-            pass: process.env.EMAIL_PASS, // App password
-        },
-    });
-        console.log('SMTP connection established.');
+            service: 'gmail',
+            port: 465,
+            secure: true,
+            auth: {
+                user: process.env.EMAIL_USER, // Gmail address
+                pass: process.env.EMAIL_PASS, // App password
+            },
+        });
         const info = await transporter.sendMail({
             from: '"Professor OTP ✉️" <youremail@gmail.com>', // Your email address
             to: email, // Receiver email
@@ -49,21 +47,4 @@ const sendOtp = async (email, otp) => {
         return null;
     }
 };
-const server = http.createServer(async (request, response) => {
-    const email = 'receiveremail@gmail.com'; 
-    const otp = Math.floor(100000 + Math.random() * 900000); 
-    console.log('Generated OTP:', otp);
-
-    const result = await sendOtp(email, otp);
-    if (result) {
-        response.writeHead(200, { 'Content-Type': 'text/plain' });
-        response.end('OTP sent successfully!');
-    } else {
-        response.writeHead(500, { 'Content-Type': 'text/plain' });
-        response.end('Failed to send OTP.');
-    }
-});
-server.listen(8080, () => {
-    console.log('Server running on http://localhost:8080');
-});
 module.exports = sendOtp;
