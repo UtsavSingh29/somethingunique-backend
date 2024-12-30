@@ -1,21 +1,26 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const CollegeSchema = new Schema({
-    name: {
-        type: String,
-        required: true,
-        unique: true,
+const CollegeSchema = new Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+        admin: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        key: {
+            type: String,
+            required: true,
+        },
     },
-    admin: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-    },
-    key: {
-        type: String,
-        required: true,
-    },
-});
+    {
+        timestamps: true,
+    }
+);
 
 module.exports =
     mongoose.models.College ||

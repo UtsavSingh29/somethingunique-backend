@@ -11,6 +11,7 @@ var fetchuser = require('../middleware/fetcher');
 const sendOtp = require('../utils/mailer.js');
 const Otp = require('../models/Otp');
 const College = require('../models/College');
+const Club = require('../models/Club');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -69,6 +70,7 @@ router.post(
                     username: user.username,
                     email: user.email,
                     college_id: user.college_id,
+                    role: user.role,
                 },
             };
             const authToken = jwt.sign(data, JWT_SECRET);
@@ -85,7 +87,6 @@ router.post(
         }
     }
 );
-
 // ROUTE 3: Get logged in User Details using: POST "/api/auth/getuser". Login required
 router.get('/get-user', fetchuser, async (req, res) => {
     try {
@@ -148,14 +149,17 @@ router.get('/send-otp', async (req, res) => {
             });
         }
 
-        if (type === 'login') {
-            const user = await User.findOne({ email });
-            if (!user) {
-                return res.status(400).json({
-                    data: null,
-                    message: 'User not found. Please sign up.',
-                });
-            }
+        const user = await User.findOne({ email });
+        if (!user && type === 'login') {
+            return res.status(400).json({
+                data: null,
+                message: 'User not found. Please sign up.',
+            });
+        } else if (user && type === 'register') {
+            return res.status(400).json({
+                data: null,
+                message: 'User already exists. Please log in.',
+            });
         }
 
         const otp = Math.floor(100000 + Math.random() * 900000);
@@ -208,6 +212,69 @@ router.get('/get-colleges', async (req, res) => {
             data: error,
             message:
                 'Error fetching colleges. Please try again later.',
+        });
+    }
+});
+
+router.get('/get-college-club', fetchuser, async (req, res) => {
+    try {
+        const college = await College.findById(req?.user?.college_id);
+        const club = await Club.findOne({ admin: req?.user?.id });
+        if (!college) {
+            return res.status(400).json({
+                data: null,
+                message: 'College not found',
+            });
+        }
+        res.status(200).json({
+            data: {
+                college,
+                club,
+            },
+            message: 'College fetched successfully',
+        });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({
+            data: error,
+            message:
+                'Error fetching college. Please try again later.',
+        });
+    }
+});
+
+router.post('/add-club', fetchuser, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(400).json({
+                data: null,
+                message: 'User not found',
+            });
+        }
+        const college = await College.findById(user.college_id);
+        if (!college) {
+            return res.status(400).json({
+                message: 'Invalid college',
+                data: null,
+            });
+        }
+        const { name, description, college_id } = req.body;
+        const club = await Club.create({
+            name,
+            description,
+            college_id: college._id,
+            admin: user._id,
+        });
+        res.status(200).json({
+            data: club,
+            message: 'Club added successfully',
+        });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({
+            data: error,
+            message: 'Internal Server Error',
         });
     }
 });
@@ -265,6 +332,7 @@ router.post('/verify-otp', async (req, res) => {
                     id: user ? user.id : null,
                     username: user ? user.username : null,
                     college_id: user ? user.college_id._id : null,
+                    role: user ? user.role : null,
                 },
             },
             process.env.JWT_SECRET,
