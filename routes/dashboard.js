@@ -182,12 +182,23 @@ router.patch('/approve-club', isCollegeAdmin, async (req, res) => {
     }
 });
 router.post('/add-college', isSuperAdmin, async (req, res) => {
-    const { name, key, city, state, country } = req.body;
+    const { name, city, state, country } = req.body;
 
+    if (city) {
+        name += ', ' + city;
+    }
+    if (state) {
+        name += ', ' + state;
+    }
+    if (country) {
+        name += ', ' + country;
+    }
     try {
         const college = new College({
-            name: name + ', ' + city + ', ' + state + ', ' + country,
-            key,
+            name: name,
+            city,
+            state,
+            country,
         });
 
         await college.save();

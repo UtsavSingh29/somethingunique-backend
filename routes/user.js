@@ -165,6 +165,7 @@ router.patch('/update-username', fetchuser, async (req, res) => {
                 username: user.username,
                 email: user.email,
                 college_id: user.college_id,
+                role: user.role,
             },
         };
         const authToken = jwt.sign(data, JWT_SECRET);
