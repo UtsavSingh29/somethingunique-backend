@@ -184,18 +184,19 @@ router.patch('/approve-club', isCollegeAdmin, async (req, res) => {
 router.post('/add-college', isSuperAdmin, async (req, res) => {
     const { name, city, state, country } = req.body;
 
+    let newName = name;
     if (city) {
-        name += ', ' + city;
+        newName += ', ' + city;
     }
     if (state) {
-        name += ', ' + state;
+        newName += ', ' + state;
     }
     if (country) {
-        name += ', ' + country;
+        newName += ', ' + country;
     }
     try {
         const college = new College({
-            name: name,
+            name: newName,
             city,
             state,
             country,
