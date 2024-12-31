@@ -8,8 +8,16 @@ const addVotesCountToPosts = require('../utils/addvotestopost');
 // Route 1: get all the notes using : Get "/api/fetchallposts"
 router.get('/get-club-posts', fetchuser, async (req, res) => {
     const clubId = req.query.clubId;
-    const club = await Club.findById(clubId);
+    const club = await Club.findById(clubId)
+        .populate('admin')
+        .populate('college_id');
     if (!club) {
+        return res.status(400).json({
+            message: 'Club not found',
+            data: null,
+        });
+    }
+    if (club.status !== 'active') {
         return res.status(400).json({
             message: 'Club not found',
             data: null,
@@ -48,6 +56,7 @@ router.get('/get-clubs', fetchuser, async (req, res) => {
     try {
         const clubs = await Club.find({
             college_id,
+            status: 'active',
         });
         res.status(200).json({
             data: clubs,
