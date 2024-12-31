@@ -7,6 +7,7 @@ const College = require('../models/College');
 const Club = require('../models/Club');
 const isSuperAdmin = require('../middleware/isSuperAdmin');
 const isCollegeAdmin = require('../middleware/isCollegeAdmin');
+const fetchuser = require('../middleware/fetcher');
 
 const getDashboardData = async (Model, tab) => {
     const data = await Model.find();
@@ -178,6 +179,29 @@ router.patch('/approve-club', isCollegeAdmin, async (req, res) => {
         res.status(500).json({
             data: error,
             message: 'Failed to approve Club.',
+        });
+    }
+});
+router.get('/get-college', fetchuser, async (req, res) => {
+    const { college_id } = req.query;
+    try {
+        const college = await College.findById(
+            college_id || req?.user?.college_id
+        );
+        if (!college) {
+            return res.status(404).json({
+                message: 'College not found',
+            });
+        }
+        res.json({
+            message: 'College fetched successfully',
+            data: college,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            data: error,
+            message: 'Failed to fetch college.',
         });
     }
 });
